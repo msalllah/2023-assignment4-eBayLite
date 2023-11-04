@@ -1,5 +1,4 @@
 from django.urls import path
-
 from . import views
 
 urlpatterns = [
@@ -15,7 +14,7 @@ urlpatterns = [
     path ("watchlist", views.displayWatchlist, name="watchlist"),
     path ("addComment/<int:id>", views.addComment, name="addComment"),
     path("categories", views.categories, name="categories"),
-    path ("addBidt/<int:id>", views.addBid, name="addBid"),
+    path ("addBid/<int:id>", views.addBid, name="addBid"),
     path ("closeAuction/<int:id>", views.closeAuction, name="closeAuction"),
 ]
 

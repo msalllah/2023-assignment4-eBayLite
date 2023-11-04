@@ -1,10 +1,12 @@
-{% block body %}
+{% extends "auctions/layout.html" %}
+
+{% block main %}
 <div class="container">
   {% if update %}
       <div class="alert alert-success" role="alert">
         {{message}}
       </div>
-      [% else %]
+      {% else %}
       <div class="alert alert-danger" role="alert">
         {{message}}
       </div>
@@ -38,6 +40,7 @@
             <button type="submit" class="btn btn-success"> add to Watchlist</button>
           </form>
     {% endif %}
+    {% endif %}
 </div>
 
 
@@ -48,11 +51,11 @@
 <p>Owner: {{listing.owner}}</p>
 <h6>Initial Price: ${{listing.price.bid}}</h6>
 {% if user.is_authenticated %}
-<form action="{url 'addBid' id=listing.id %}" method="POST">
+<form action="{% url 'addBid' id=listing.id %}" method="POST">
   {% csrf_token %}
   <div class="form-group">
-    <label for="price"> Add Comment</label>
-    <input type="text" name="newComment" placeholder="Add New Comments">
+    <label for="newBid"> Bid</label>
+    <input type="text" name="newBid" placeholder="">
     <button type="submit" class="btn btn-primary">Add</button>
     </div>
 </form>
@@ -62,10 +65,10 @@
 <h2>Comments</h2>
 <br/>
 {% if user.is_authenticated %}
-  <form action="{url 'addComment' id=listing.id %}" method="POST">
+  <form action="{% url 'addComment' id=listing.id %}" method="POST">
     {% csrf_token %}
     <div class="form-group">
-      <label for="price"> Add Comment</label>
+      <label for="newComment"> Add Comment</label>
       <input type="text" name="newComment" placeholder="Add New Comments">
       <button type="submit" class="btn btn-waring">Add</button>
       </div>
@@ -75,7 +78,7 @@
 <ul class="list-group">
   {% for comment in allComments %}
   <li class="list-group-item"> 
-    {{comment. message}}
+    {{comment.message}}
     <br/>
     <p>Posted by {{comment.author}}</p>
 
