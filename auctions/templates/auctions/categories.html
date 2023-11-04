@@ -1,14 +1,14 @@
 {% extends "auctions/layout.html" %}
 
-{% block body %}
+{% block main %}
     <h2>Categories</h2>
-    
+
     {# Ensure the form's action attribute points to the correct URL for filtering #}
-    <form action="{% url 'filter' %}" method="get"> {# Ensure this is the correct name for your URL! #}
+    <form action="{% url 'displayCategory' %}" method="get"> {# Ensure this is the correct name for your URL! #}
         <select name="category" class="form-control">
             <option value="">--Select a category--</option>
             {% for category in categories %}
-                <option value="{{ category.id }}">{{ category.name }}</option>
+                <option value="{{ category.id }}">{{ category.CategoryName }}</option>
             {% endfor %}
         </select>
         <br>

@@ -10,7 +10,7 @@ def listing(request, id):
     listingData = Listing.objects.get(pk=id)
     isListingInWatchlist = request.user in listingData.watchlist.all()
     allComments = Comment.objects.filter(listing=listingData)
-    isOwner = request.username == listingData.owner.username
+    isOwner = (request.user == listingData.owner)
     return render(request, "auctions/listing.html",{
         "listing": listingData,
         "isListingInWatchlist": isListingInWatchlist ,
@@ -22,7 +22,7 @@ def closeAuction(request, id):
     listingData = Listing.objects.get(pk=id)
     listingData.isActive = False
     listingData.save()
-    isOwner = request.username == listingData.owner.username
+    isOwner = request.user == listingData.owner.user
     isListingInWatchlist = request.user in listingData.watchlist.all()
     allComments = Comment.objects.filter(listing=listingData)
     return render(request, "auctions/listing.html",{
@@ -36,16 +36,17 @@ def closeAuction(request, id):
 
 
 def addBid(request, id):
-    newBid = request.POST('newBid')
+    newBid = request.POST['newBid']
     listingData = Listing.objects.get(pk=id)
+    isOwner = request.user == listingData.owner.user
+    isListingInWatchlist = request.user in listingData.watchlist.all()
+    allComments = Comment.objects.filter(listing=listingData)
     if int(newBid) > listingData.price.bid:
         updateBid = Bid(user=request.user, bid=int(newBid))
         updateBid.save()
         listingData.price = updateBid
         listingData.save()
-        isOwner = request.username == listingData.owner.username
-        isListingInWatchlist = request.user in listingData.watchlist.all()
-        allComments = Comment.objects.filter(listing=listingData)
+
         return render(request, "auctions/listing.html",{
             "listing": listingData,
             "message": "Bid was updated successfully",
@@ -112,15 +113,16 @@ def categories(request):
 
 def index(request):
     activeListings= Listing.objects.filter(isActive=True)
+    print(activeListings)
     allCategories= Category.objects.all()
     return render(request,"auctions/index.html",
-         { 'activelistings': activeListings})
+         { 'activeListings': activeListings})
 
 
 def displayCategory(request):
-    if request.method == "POST":
-        categoryFromForm = request.POST['category']
-        category = Category.objects.get(categoryName=categoryFromForm)
+    if request.method == "GET":
+        categoryFromForm = request.GET['category']
+        category = Category.objects.get(pk=categoryFromForm)
         activeListings = Listing.objects.filter(isActive=True, category=category)
         allCategories = Category.objects.all()
     return render(request, "auctions/index.html",{
@@ -146,18 +148,18 @@ def createListing(request):
     #who is the user
     currentUser = request.user
 
-    # Get all content about the particular catgpry
-    categoryData = Category.objects.get(CategoryName=category)
+    # # Get all content about the particular catgpry
+    # categoryData = Category.objects.get(CategoryName=category)
     #creat a bid object
-    bid= Bid(bid=float(price), user=currentUser)
+    bid= Bid(bid=int(price), user=currentUser)
     bid.save()
     #Create a new listing object
     newListing = Listing(
         title=title,
         description=description,
         imageUrl=imageurl,
-        price=float(price),
-        category=categoryData,
+        price=bid,
+        category=Category.objects.get(CategoryName=category),
         owner=currentUser
     )
     #Insert the object in our database
